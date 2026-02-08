@@ -16,24 +16,27 @@ use crate::scanner::scan_directories;
 use crate::ui::icons::{DICE_SVG, WALLHAVEN_SVG};
 use super::platform_specific_settings;
 
-pub fn run() -> iced::Result {
+pub fn run(window_width: u32, window_height: u32) -> iced::Result {
+    let w = window_width as f32;
+    let h = window_height as f32;
+
     application("Wallpicker", update, view)
         .theme(|_| Theme::Dark)
         .antialiasing(true)
         .window(window::Settings {
-            size: Size::new(1850.0, 1080.0),
-            resizable: false,
+            size: Size::new(w, h),
+            resizable: true,
             decorations: false,
             platform_specific: platform_specific_settings("wallpicker-main"),
             ..Default::default()
         })
         .subscription(|_state| iced::event::listen().map(Message::EventOccurred))
-        .run_with(|| {
+        .run_with(move || {
             let mut s = WallPicker::default();
             let cfg = crate::config::load_or_create_config();
             s.config = cfg;
-            s.window_width = 1850;
-            s.window_height = 1080;
+            s.window_width = window_width;
+            s.window_height = window_height;
             (s, Task::perform(async {}, |_| Message::ScanDirectory))
         })
 }

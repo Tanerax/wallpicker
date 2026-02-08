@@ -16,6 +16,7 @@ url = "2"
 urlencoding = "2.1"
 single-instance = "0.3"
 rand = "0.8.5"
+screen_size = "0.1"
 
 [[bin]]
 name = "wallpicker"

@@ -81,6 +81,17 @@ fn enforce_single_instance() -> Result<(), String> {
     Ok(())
 }
 
+fn screen_size() -> (u32, u32) {
+    let scale = 0.8;
+    match screen_size::get_primary_screen_size() {
+        Ok((w, h)) => (
+            (w as f64 * scale) as u32,
+            (h as f64 * scale) as u32,
+        ),
+        Err(_) => (1280, 800),
+    }
+}
+
 fn main() -> iced::Result {
     let mode = match parse_args() {
         Ok(m) => m,
@@ -166,7 +177,8 @@ fn main() -> iced::Result {
                 }
             }
 
-            ui::run()
+            let (w, h) = screen_size();
+            ui::run(w, h)
         }
     }
 }
