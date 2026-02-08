@@ -1,5 +1,4 @@
 use crate::config::{self, Config};
-use crate::wallpaper::copy_to_current_wallpaper;
 use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
@@ -61,7 +60,9 @@ pub async fn fetch_wallhaven_wallpaper(cfg: &Config) -> Result<Option<PathBuf>, 
         file.write_all(&chunk)?;
     }
 
-    let _ = copy_to_current_wallpaper(&dest_path);
+    if cfg.copy_to_tmp {
+        let _ = crate::wallpaper::copy_to_current_wallpaper(&dest_path);
+    }
 
     Ok(Some(dest_path))
 }

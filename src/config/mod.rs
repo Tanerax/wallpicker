@@ -14,6 +14,8 @@ pub struct Config {
     pub wallhaven_purity: String,
     #[serde(default = "default_wallhaven_resolution")]
     pub wallhaven_resolution: String,
+    #[serde(default)]
+    pub copy_to_tmp: bool,
 }
 
 fn default_wallhaven_resolution() -> String {
@@ -31,6 +33,7 @@ impl Default for Config {
             wallhaven_purity: String::from("100"),
             wallhaven_categories: String::from("111"),
             wallhaven_resolution: default_wallhaven_resolution(),
+            copy_to_tmp: false,
         }
     }
 }

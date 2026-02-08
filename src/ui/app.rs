@@ -101,7 +101,8 @@ fn update(state: &mut WallPicker, message: Message) -> Task<Message> {
         Message::SelectWallpaper(path) => {
             state.selected = Some(path.clone());
 
-            return Task::perform(crate::commands::set_wallpaper(path), |_| Message::Close);
+            let copy_to_tmp = state.config.copy_to_tmp;
+            return Task::perform(crate::commands::set_wallpaper(path, copy_to_tmp), |_| Message::Close);
         }
         Message::OpenPreview(p) => {
             let p_for_process = p.clone();
