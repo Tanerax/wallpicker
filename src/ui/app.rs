@@ -14,6 +14,7 @@ use crate::config::Config;
 use crate::image::{THUMB_SIZE, load_thumb};
 use crate::scanner::scan_directories;
 use crate::ui::icons::{DICE_SVG, WALLHAVEN_SVG};
+use super::platform_specific_settings;
 
 pub fn run() -> iced::Result {
     application("Wallpicker", update, view)
@@ -23,10 +24,7 @@ pub fn run() -> iced::Result {
             size: Size::new(1850.0, 1080.0),
             resizable: false,
             decorations: false,
-            platform_specific: window::settings::PlatformSpecific {
-                application_id: String::from("wallpicker-main"),
-                override_redirect: false,
-            },
+            platform_specific: platform_specific_settings("wallpicker-main"),
             ..Default::default()
         })
         .subscription(|_state| iced::event::listen().map(Message::EventOccurred))

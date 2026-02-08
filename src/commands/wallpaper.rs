@@ -6,14 +6,25 @@ pub async fn set_wallpaper(path: PathBuf) -> () {
     let _ = copy_to_current_wallpaper(&path);
 
     let _ = tokio::task::spawn_blocking(move || {
-        std::process::Command::new("swww")
-            .arg("img")
-            .arg(path)
-            .arg("--transition-type")
-            .arg("outer")
-            .arg("--transition-fps")
-            .arg("60")
-            .status()
+        if cfg!(target_os = "macos") {
+            let script = format!(
+                "tell application \"Finder\" to set desktop picture to POSIX file \"{}\"",
+                path.display()
+            );
+            std::process::Command::new("osascript")
+                .arg("-e")
+                .arg(&script)
+                .status()
+        } else {
+            std::process::Command::new("swww")
+                .arg("img")
+                .arg(&path)
+                .arg("--transition-type")
+                .arg("outer")
+                .arg("--transition-fps")
+                .arg("60")
+                .status()
+        }
     })
     .await;
 }

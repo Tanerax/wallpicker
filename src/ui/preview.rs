@@ -33,10 +33,7 @@ pub fn run(path: PathBuf) -> iced::Result {
             size: Size::new(1920.0, 1080.0),
             resizable: true,
             decorations: true,
-            platform_specific: window::settings::PlatformSpecific {
-                application_id: String::from("wallpicker-preview"),
-                override_redirect: false
-            },
+            platform_specific: super::platform_specific_settings("wallpicker-preview"),
             ..Default::default()
         })
         .subscription(|_state| iced::event::listen().map(Message::EventOccurred))
