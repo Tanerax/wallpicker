@@ -6,6 +6,8 @@ mod commands;
 mod ui;
 mod wallhaven;
 mod wallpaper;
+#[cfg(target_os = "macos")]
+mod tray;
 
 use std::path::PathBuf;
 
@@ -16,6 +18,8 @@ enum Mode {
     Clean,
     Generate,
     Dedupe,
+    #[cfg(target_os = "macos")]
+    Toolbar,
 }
 
 fn parse_args() -> Result<Mode, String> {
@@ -35,11 +39,15 @@ fn parse_args() -> Result<Mode, String> {
             "--clean" => Mode::Clean,
             "--generate" => Mode::Generate,
             "--dedupe" => Mode::Dedupe,
+            #[cfg(target_os = "macos")]
+            "--toolbar" => Mode::Toolbar,
             "--help" | "-h" => {
-                return Err(
-                    "Usage:\n  wallpicker [--preview <path> | --random | --clean | --generate | --dedupe]\n"
-                        .to_string(),
-                );
+                let mut usage = "Usage:\n  wallpicker [--preview <path> | --random | --clean | --generate | --dedupe".to_string();
+                if cfg!(target_os = "macos") {
+                    usage.push_str(" | --toolbar");
+                }
+                usage.push_str("]\n");
+                return Err(usage);
             }
             _ => {
                 return Err(format!("Unknown argument: {arg}"));
@@ -162,6 +170,12 @@ fn main() -> iced::Result {
             run_async(async move {
                 crate::commands::run_dedupe(cfg).await;
             });
+            Ok(())
+        }
+        #[cfg(target_os = "macos")]
+        Mode::Toolbar => {
+            let cfg = crate::config::load_or_create_config();
+            tray::run(cfg);
             Ok(())
         }
         Mode::Ui => {
