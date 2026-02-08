@@ -12,6 +12,15 @@ pub struct Config {
     pub wallhaven_categories: String,
     #[serde(default)]
     pub wallhaven_purity: String,
+    #[serde(default = "default_wallhaven_resolution")]
+    pub wallhaven_resolution: String,
+}
+
+fn default_wallhaven_resolution() -> String {
+    match screen_size::get_primary_screen_size() {
+        Ok((w, h)) => format!("{w}x{h}"),
+        Err(_) => String::from("1920x1080"),
+    }
 }
 
 impl Default for Config {
@@ -21,6 +30,7 @@ impl Default for Config {
             wallhaven_api_key: String::new(),
             wallhaven_purity: String::from("100"),
             wallhaven_categories: String::from("111"),
+            wallhaven_resolution: default_wallhaven_resolution(),
         }
     }
 }

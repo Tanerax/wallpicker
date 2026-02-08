@@ -18,12 +18,14 @@ pub async fn fetch_wallhaven_wallpaper(cfg: &Config) -> Result<Option<PathBuf>, 
     let api_key = cfg.wallhaven_api_key.trim().to_string();
     let purity = cfg.wallhaven_purity.trim().to_string();
     let categories = cfg.wallhaven_categories.trim().to_string();
+    let resolution = cfg.wallhaven_resolution.trim().to_string();
 
     let url = format!(
-        "https://wallhaven.cc/api/v1/search?apikey={}&categories={}&purity={}&atleast=3840x2160&ratios=landscape&sorting=random",
+        "https://wallhaven.cc/api/v1/search?apikey={}&categories={}&purity={}&atleast={}&ratios=landscape&sorting=random",
         urlencoding::encode(&api_key),
         urlencoding::encode(&categories),
-        urlencoding::encode(&purity)
+        urlencoding::encode(&purity),
+        urlencoding::encode(&resolution)
     );
 
     let client = reqwest::Client::builder()
