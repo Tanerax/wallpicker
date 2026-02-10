@@ -14,6 +14,7 @@ cargo run -- --random                # Set random wallpaper from configured fold
 cargo run -- --clean                 # Remove orphaned cache entries
 cargo run -- --generate              # Pre-generate all thumbnails
 cargo run -- --dedupe                # Interactive duplicate finder
+cargo run -- --toolbar               # Run macOS system tray mode (macOS only)
 cargo clippy                         # Lint
 cargo fmt                            # Format code
 ```
@@ -35,9 +36,10 @@ Wallpicker is a Rust desktop wallpaper manager with both a GUI (Iced framework) 
 - **`scanner/`** — Recursive directory walker; finds PNG/JPEG/WebP files
 - **`image/`** — Thumbnail generation (200×200px) with async loading
 - **`cache/`** — Thumbnail cache keyed by BLAKE3 hash of `path|mtime|size|thumbsize`, stored as PNGs in `~/.config/wallpicker/cache/`
-- **`config/`** — JSON config at `~/.config/wallpicker/config.json` with fields: `folders`, `wallhaven_api_key`, `wallhaven_categories`, `wallhaven_purity`, `wallhaven_resolution` (defaults to detected screen resolution)
+- **`config/`** — JSON config at `~/.config/wallpicker/config.json` with fields: `folders`, `wallhaven_api_key`, `wallhaven_categories`, `wallhaven_purity`, `wallhaven_resolution` (defaults to detected screen resolution), `copy_to_tmp` (default false)
 - **`wallpaper/`** — Random wallpaper selection logic
 - **`wallhaven/`** — Wallhaven.cc API client (search endpoint)
+- **`tray/`** — macOS system tray integration (menu bar icon with UI and Wallhaven options)
 
 ### Key Patterns
 
@@ -46,10 +48,11 @@ Wallpicker is a Rust desktop wallpaper manager with both a GUI (Iced framework) 
 - **Single instance**: Uses `single-instance` crate to prevent duplicate windows
 - **Screen-aware sizing**: Window scales to 80% of primary screen via `screen_size` crate; Wallhaven searches default to screen resolution
 - **Platform abstraction**: `cfg!(target_os)` guards in `commands/wallpaper.rs` and `ui/mod.rs` for Linux/macOS differences
+- **macOS system tray**: On macOS, `--toolbar` flag enables menu bar icon with UI and Wallhaven options
 
 ### External Dependencies
 
 - **Linux**: `swww` must be installed and in PATH (Wayland wallpaper setter)
 - **macOS**: Uses built-in `osascript` to set wallpaper via Finder
 - Config/cache lives under `~/.config/wallpicker/`
-- Wallpaper copy goes to `/tmp/current_wallpaper`
+- Wallpaper copy goes to `/tmp/current_wallpaper` (controlled by `copy_to_tmp` config option)
