@@ -51,11 +51,10 @@ pub fn ensure_thumb_cached<P: AsRef<Path>>(path: P, size: u32) -> io::Result<boo
         return Ok(false);
     }
 
-    let img = match image::open(path) {
-        Ok(i) => i,
-        Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e)),
-    };
-    let thumb = img.thumbnail(size, size).to_rgba8();
+    let img = image::open(path).map_err(|e| {
+        io::Error::new(io::ErrorKind::Other, e)
+    });
+    let thumb = img?.thumbnail(size, size).to_rgba8();
 
     if let Some(parent) = cache_path.parent() {
         fs::create_dir_all(parent)?;
@@ -67,9 +66,10 @@ pub fn ensure_thumb_cached<P: AsRef<Path>>(path: P, size: u32) -> io::Result<boo
         .unwrap_or(0);
 
     let tmp_path = cache_path.with_extension(format!("{}.png", nanos));
-    let dynamic_image = image::DynamicImage::ImageRgba8(thumb);
 
-    dynamic_image.save(&tmp_path).map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+    image::DynamicImage::ImageRgba8(thumb)
+        .save(&tmp_path)
+        .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
 
     fs::rename(&tmp_path, &cache_path)?;
 
