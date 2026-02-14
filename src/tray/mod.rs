@@ -120,6 +120,6 @@ pub fn run(cfg: Config) {
 
 fn spawn_ui() {
     if let Ok(exe) = std::env::current_exe() {
-        let _ = std::process::Command::new(exe).spawn();
+        let _ = std::process::Command::new(exe).arg("--ui").spawn();
     }
 }

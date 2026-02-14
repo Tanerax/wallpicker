@@ -19,7 +19,7 @@ enum Mode {
     Generate,
     Dedupe,
     #[cfg(target_os = "macos")]
-    Toolbar,
+    Tray,
 }
 
 fn parse_args() -> Result<Mode, String> {
@@ -35,19 +35,14 @@ fn parse_args() -> Result<Mode, String> {
                     .ok_or_else(|| "Missing value after --preview".to_string())?;
                 Mode::Preview(PathBuf::from(p))
             }
+            #[cfg(target_os = "macos")]
+            "--ui" => Mode::Ui,
             "--random" => Mode::Random,
             "--clean" => Mode::Clean,
             "--generate" => Mode::Generate,
             "--dedupe" => Mode::Dedupe,
-            #[cfg(target_os = "macos")]
-            "--toolbar" => Mode::Toolbar,
             "--help" | "-h" => {
-                let mut usage = "Usage:\n  wallpicker [--preview <path> | --random | --clean | --generate | --dedupe".to_string();
-                if cfg!(target_os = "macos") {
-                    usage.push_str(" | --toolbar");
-                }
-                usage.push_str("]\n");
-                return Err(usage);
+                return Err("Usage:\n  wallpicker [--ui | --preview <path> | --random | --clean | --generate | --dedupe]\n".to_string());
             }
             _ => {
                 return Err(format!("Unknown argument: {arg}"));
@@ -61,6 +56,9 @@ fn parse_args() -> Result<Mode, String> {
         selected = Some(next_mode);
     }
 
+    #[cfg(target_os = "macos")]
+    return Ok(selected.unwrap_or(Mode::Tray));
+    #[cfg(not(target_os = "macos"))]
     Ok(selected.unwrap_or(Mode::Ui))
 }
 
@@ -173,7 +171,7 @@ fn main() -> iced::Result {
             Ok(())
         }
         #[cfg(target_os = "macos")]
-        Mode::Toolbar => {
+        Mode::Tray => {
             let cfg = crate::config::load_or_create_config();
             tray::run(cfg);
             Ok(())

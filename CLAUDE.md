@@ -14,9 +14,9 @@ cargo run -- --random                # Set random wallpaper from configured fold
 cargo run -- --clean                 # Remove orphaned cache entries
 cargo run -- --generate              # Pre-generate all thumbnails
 cargo run -- --dedupe                # Interactive duplicate finder
-cargo run -- --toolbar               # Run macOS system tray mode (macOS only)
 cargo clippy                         # Lint
 cargo fmt                            # Format code
+./bundle-macos.sh                    # Build release + create Wallpicker.app (macOS only)
 ```
 
 No test suite exists yet.
