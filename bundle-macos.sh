@@ -25,6 +25,23 @@ mkdir -p "${BUNDLE}/Contents/Resources"
 # Copy binary
 cp "${BINARY}" "${BUNDLE}/Contents/MacOS/${BINARY_NAME}"
 
+# Build AppIcon.icns from resources/icon.png
+ICON_SRC="resources/icon.png"
+if [ ! -f "${ICON_SRC}" ]; then
+    echo "Warning: ${ICON_SRC} not found, skipping icon" >&2
+else
+    ICONSET=$(mktemp -d)/AppIcon.iconset
+    mkdir -p "${ICONSET}"
+    for size in 16 32 128 256 512; do
+        sips -z ${size} ${size} "${ICON_SRC}" --out "${ICONSET}/icon_${size}x${size}.png"        >/dev/null 2>&1
+        dbl=$((size * 2))
+        sips -z ${dbl} ${dbl} "${ICON_SRC}" --out "${ICONSET}/icon_${size}x${size}@2x.png" >/dev/null 2>&1
+    done
+    iconutil -c icns "${ICONSET}" -o "${BUNDLE}/Contents/Resources/AppIcon.icns"
+    rm -rf "$(dirname "${ICONSET}")"
+    echo "Icon built: AppIcon.icns"
+fi
+
 # Write Info.plist
 VERSION=$(cargo metadata --no-deps --format-version 1 \
     | python3 -c "import sys,json; pkgs=json.load(sys.stdin)['packages']; \
@@ -48,6 +65,8 @@ cat > "${BUNDLE}/Contents/Info.plist" <<PLIST
     <string>${VERSION}</string>
     <key>CFBundleExecutable</key>
     <string>${BINARY_NAME}</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleSignature</key>

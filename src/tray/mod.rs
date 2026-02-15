@@ -80,9 +80,9 @@ pub fn run(cfg: Config) {
     );
 
     let menu = Menu::new();
-    let open_item = MenuItem::new("Open Wallpicker", true, None);
-    let random_item = MenuItem::new("Random Wallpaper", true, None);
-    let random_wh_item = MenuItem::new("Random WallHaven", true, None);
+    let open_item = MenuItem::new("Open", true, None);
+    let random_item = MenuItem::new("Wallpaper", true, None);
+    let random_wh_item = MenuItem::new("Wallhaven", true, None);
     let quit_item = MenuItem::new("Quit", true, None);
 
     menu.append(&open_item).unwrap();
