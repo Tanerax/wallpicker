@@ -3,11 +3,10 @@ mod cache;
 mod scanner;
 mod image;
 mod commands;
+mod platform;
 mod ui;
 mod wallhaven;
 mod wallpaper;
-#[cfg(target_os = "macos")]
-mod tray;
 
 use std::path::PathBuf;
 
@@ -173,7 +172,7 @@ fn main() -> iced::Result {
         #[cfg(target_os = "macos")]
         Mode::Tray => {
             let cfg = crate::config::load_or_create_config();
-            tray::run(cfg);
+            crate::platform::macos::tray::run(cfg);
             Ok(())
         }
         Mode::Ui => {
