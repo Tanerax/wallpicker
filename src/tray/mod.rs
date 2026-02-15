@@ -1,12 +1,13 @@
-use crate::config::Config;
+use crate::config::{config_file_path, Config};
 use std::ffi::c_void;
 use std::sync::Arc;
-use tray_icon::menu::{Menu, MenuEvent, MenuItem};
+use tray_icon::menu::{Menu, MenuEvent, MenuItem, PredefinedMenuItem};
 use tray_icon::{Icon, TrayIconBuilder};
 
 #[derive(Debug, Clone, Copy)]
 enum TrayCommand {
     OpenUi,
+    OpenConfig,
     RandomWallpaper,
     RandomWallhaven,
     Quit,
@@ -83,11 +84,16 @@ pub fn run(cfg: Config) {
     let open_item = MenuItem::new("Open", true, None);
     let random_item = MenuItem::new("Wallpaper", true, None);
     let random_wh_item = MenuItem::new("Wallhaven", true, None);
+    let open_config_item = MenuItem::new("Config", true, None);
     let quit_item = MenuItem::new("Quit", true, None);
 
     menu.append(&open_item).unwrap();
+    menu.append(&PredefinedMenuItem::separator()).unwrap();
     menu.append(&random_item).unwrap();
     menu.append(&random_wh_item).unwrap();
+    menu.append(&PredefinedMenuItem::separator()).unwrap();
+    menu.append(&open_config_item).unwrap();
+    menu.append(&PredefinedMenuItem::separator()).unwrap();
     menu.append(&quit_item).unwrap();
 
     let _tray = TrayIconBuilder::new()
@@ -99,6 +105,7 @@ pub fn run(cfg: Config) {
         .expect("failed to build tray icon");
 
     let open_id = open_item.id().clone();
+    let open_config_id = open_config_item.id().clone();
     let random_id = random_item.id().clone();
     let random_wh_id = random_wh_item.id().clone();
     let quit_id = quit_item.id().clone();
@@ -106,6 +113,8 @@ pub fn run(cfg: Config) {
     let id_to_cmd = move |id: &_| -> Option<TrayCommand> {
         if *id == open_id {
             Some(TrayCommand::OpenUi)
+        } else if *id == open_config_id {
+            Some(TrayCommand::OpenConfig)
         } else if *id == random_id {
             Some(TrayCommand::RandomWallpaper)
         } else if *id == random_wh_id {
@@ -125,6 +134,10 @@ pub fn run(cfg: Config) {
         match cmd {
             TrayCommand::OpenUi => {
                 spawn_ui();
+            }
+            TrayCommand::OpenConfig => {
+                let path = config_file_path();
+                let _ = std::process::Command::new("open").arg(path).spawn();
             }
             TrayCommand::RandomWallpaper => {
                 let cfg = cfg.clone();
